@@ -39,8 +39,8 @@ class VoiceEncoder_train(VoiceEncoder):
         D = 256
         output = torch.empty([N, M, D])
 
-        for n, emotion in enumerate(data.emotions):
-            for m, audio in enumerate(data[emotion]):
-                output[n, m, :] = self.embed_utterance_train(audio)
+        for n, emotion in enumerate(list(data.keys())):
+            for m, au in enumerate(data[emotion]):
+                output[n, m, :] = self.embed_utterance_train(au)
 
         return output
