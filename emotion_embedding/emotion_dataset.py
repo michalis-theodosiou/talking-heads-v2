@@ -66,10 +66,10 @@ class audio_data_ge2e(Dataset):
                     test_speakers = random.sample(speakers, 10)
                     if split == 'train':
                         self.dataset = {spk: dataset[spk]
-                                        for spk in speakers.keys() if spk not in test_speakers}
+                                        for spk in speakers if spk not in test_speakers}
                     elif split == 'test':
                         self.dataset = {spk: dataset[spk]
-                                        for spk in speakers.keys() if spk in test_speakers}
+                                        for spk in speakers if spk in test_speakers}
                     else:
                         raise ValueError('split parameter must equal "train" or "test"')
 
