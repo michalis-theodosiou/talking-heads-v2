@@ -102,7 +102,3 @@ class audio_data_ge2e(Dataset):
                     self.dataset[speaker][emotion], self.num_utterances)
 
         return output_dict
-
-
-def split_dataset(dataset):
-    for
