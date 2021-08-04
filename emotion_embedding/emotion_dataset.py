@@ -93,7 +93,6 @@ class audio_data_ge2e(Dataset):
                 for emotion in self.emotions:
                     all_files = glob.glob(
                         f'{self.dir}/{speaker}/audio/{emotion}/{self.intensity_level}/*.m4a')
-                    if
                     chosen_files = random.sample(all_files, self.num_utterances)
                     output_dict[emotion] = []
                     for f in chosen_files:
