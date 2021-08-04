@@ -64,10 +64,10 @@ class audio_data_ge2e(Dataset):
                     speakers = list(dataset.keys())
                     random.seed(1)
                     test_speakers = random.sample(speakers, 10)
-                    if type == 'train':
+                    if split == 'train':
                         self.dataset = {spk: dataset[spk]
                                         for spk in speakers.keys() if spk not in test_speakers}
-                    elif type == 'test':
+                    elif split == 'test':
                         self.dataset = {spk: dataset[spk]
                                         for spk in speakers.keys() if spk in test_speakers}
                     else:
