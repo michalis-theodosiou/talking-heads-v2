@@ -4,6 +4,7 @@ from resemblyzer import preprocess_wav
 import random
 from torch.utils.data import Dataset
 import pickle
+import random
 # function to extract dataset
 
 
@@ -35,7 +36,7 @@ class audio_data_ge2e(Dataset):
 
     """
 
-    def __init__(self, memory='ram', num_utterances=16, intensity=3, directory=None):
+    def __init__(self, memory='ram', num_utterances=16, intensity=3, directory=None, split=None):
 
         self.memory = memory
         self.num_utterances = num_utterances
@@ -55,7 +56,23 @@ class audio_data_ge2e(Dataset):
         if self.memory == 'ram':
             with open(f'/content/drive/MyDrive/Colab Datasets/MEAD_{self.intensity}_total.pkl', 'rb') as f:
                 print('loading dataset from drive...')
-                self.dataset = pickle.load(f)
+
+                if split is None:
+                    self.dataset = pickle.load(f)
+                else:
+                    dataset = pickle.load(f)
+                    speakers = list(dataset.keys())
+                    random.seed(1)
+                    test_speakers = random.sample(speakers, 10)
+                    if type == 'train':
+                        self.dataset = {spk: dataset[spk]
+                                        for spk in speakers.keys() if spk not in test_speakers}
+                    elif type == 'test':
+                        self.dataset = {spk: dataset[spk]
+                                        for spk in speakers.keys() if spk in test_speakers}
+                    else:
+                        raise ValueError('split parameter must equal "train" or "test"')
+
             self.speakers = list(self.dataset.keys())
             self.emotions = list(self.dataset[self.speakers[0]].keys())
 
@@ -85,3 +102,7 @@ class audio_data_ge2e(Dataset):
                     self.dataset[speaker][emotion], self.num_utterances)
 
         return output_dict
+
+
+def split_dataset(dataset):
+    for
