@@ -4,7 +4,6 @@ from resemblyzer import preprocess_wav
 import random
 from torch.utils.data import Dataset
 import pickle
-import random
 
 
 class audio_data_ge2e(Dataset):
@@ -46,16 +45,17 @@ class audio_data_ge2e(Dataset):
         self.split = split
 
         assert memory in ('ram', 'disk'), 'memory parameter must be \'ram\' or \'disk\''
-        assert split in ('test', 'train', None), 'split parameter must equal "train", "test" or None')
+        assert split in (
+            'test', 'train', None), 'split parameter must equal "train", "test" or None'
 
         if memory == 'disk':
-            self.intensity_level='level_' + str(intensity)
-            self.dir=directory
-            self.filelist=glob.glob('{}/**/{}/*.m4a'.format(self.dir,
-                                      self.intensity_level), recursive = True)
-            self.emotions=sorted(list(set(path.split('/')[3] for path in self.filelist)))
-            self.speakers=sorted(list(set(path.split('/')[1] for path in self.filelist)))
-            self.utterances=sorted(
+            self.intensity_level = 'level_' + str(intensity)
+            self.dir = directory
+            self.filelist = glob.glob('{}/**/{}/*.m4a'.format(self.dir,
+                                                              self.intensity_level), recursive=True)
+            self.emotions = sorted(list(set(path.split('/')[3] for path in self.filelist)))
+            self.speakers = sorted(list(set(path.split('/')[1] for path in self.filelist)))
+            self.utterances = sorted(
                 list(set(path.split('/')[5].split('.')[0] for path in self.filelist)))
 
         if self.memory == 'ram':
@@ -63,14 +63,14 @@ class audio_data_ge2e(Dataset):
                 print('loading dataset from drive...')
 
                 if split is None:
-                    self.dataset=pickle.load(f)
+                    self.dataset = pickle.load(f)
                 else:
-                    dataset=pickle.load(f)
-                    speakers=list(dataset.keys())
+                    dataset = pickle.load(f)
+                    speakers = list(dataset.keys())
                     random.seed(1)
-                    test_speakers=random.sample(speakers, 10)
+                    test_speakers = random.sample(speakers, 10)
                     if split == 'train':
-                        self.dataset={spk: dataset[spk]
+                        self.dataset = {spk: dataset[spk]
                                         for spk in speakers if spk not in test_speakers}
                     elif split == 'test':
                         self.dataset = {spk: dataset[spk]
