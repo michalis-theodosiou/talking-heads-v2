@@ -12,6 +12,7 @@ class VoiceEncoder_train(VoiceEncoder):
     def __init__(self):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         super().__init__(device)
+        self.relu = torch.nn.LeakyReLU()
 
     def embed_utterance_train(self, wav, rate=1.3, min_coverage=0.75):
         wav_slices, mel_slices = self.compute_partial_slices(len(wav), rate, min_coverage)
@@ -42,5 +43,24 @@ class VoiceEncoder_train(VoiceEncoder):
         for n, emotion in enumerate(list(data.keys())):
             for m, au in enumerate(data[emotion]):
                 output[n, m, :] = self.embed_utterance_train(au)
+
+        return output
+
+    def embed_dataset(self, dataset):
+        # get count of utterances by emotion
+        emotion_counts = {}
+        for emotion in dataset.emotions:
+            emotion_counts[emotion] = 0
+            for speaker in dataset.speakers:
+                emotion_counts[emotion] += len(dataset.dataset[speaker][emotion])
+        output = {}
+        # create empty output dictionary and populate with embeddings
+        for emotion in dataset.emotions:
+            output[emotion] = torch.zeros((emotion_counts[emotion], 256))
+            c = 0
+            for speaker in dataset.speakers:
+                for utterance in dataset.dataset[speaker][emotion]:
+                    output[emotion][c] = self.embed_utterance_train(utterance)
+                    c += 1
 
         return output
