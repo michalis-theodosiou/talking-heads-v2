@@ -48,19 +48,21 @@ class VoiceEncoder_train(VoiceEncoder):
 
     def embed_dataset(self, dataset):
         # get count of utterances by emotion
-        emotion_counts = {}
-        for emotion in dataset.emotions:
-            emotion_counts[emotion] = 0
-            for speaker in dataset.speakers:
-                emotion_counts[emotion] += len(dataset.dataset[speaker][emotion])
-        output = {}
-        # create empty output dictionary and populate with embeddings
-        for emotion in dataset.emotions:
-            output[emotion] = torch.zeros((emotion_counts[emotion], 256))
-            c = 0
-            for speaker in dataset.speakers:
-                for utterance in dataset.dataset[speaker][emotion]:
-                    output[emotion][c] = self.embed_utterance_train(utterance)
-                    c += 1
+        self.eval()
+        with torch.no_grad():
+            emotion_counts = {}
+            for emotion in dataset.emotions:
+                emotion_counts[emotion] = 0
+                for speaker in dataset.speakers:
+                    emotion_counts[emotion] += len(dataset.dataset[speaker][emotion])
+            output = {}
+            # create empty output dictionary and populate with embeddings
+            for emotion in dataset.emotions:
+                output[emotion] = torch.zeros((emotion_counts[emotion], 256))
+                c = 0
+                for speaker in dataset.speakers:
+                    for utterance in dataset.dataset[speaker][emotion]:
+                        output[emotion][c] = self.embed_utterance_train(utterance)
+                        c += 1
 
         return output
