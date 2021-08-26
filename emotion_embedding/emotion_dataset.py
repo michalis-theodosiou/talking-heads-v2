@@ -4,6 +4,8 @@ from resemblyzer import preprocess_wav
 import random
 from torch.utils.data import Dataset
 import pickle
+import pandas as pd
+import numpy as np
 
 
 class audio_data_ge2e(Dataset):
@@ -107,3 +109,103 @@ class audio_data_ge2e(Dataset):
                     self.dataset[speaker][emotion], self.num_utterances)
 
         return output_dict
+
+
+class audio_data_triplet(Dataset):
+    """
+    A class to load a batch of audio files to calculate the ge2e loss.
+    Creates returns data in the format
+
+    Input Params
+    -----------
+    directory : str
+      The directory where the audio files are located in the original MEAD directory structure
+    intensity: int
+      The intensity (from 1 - 3) from which to load audio
+    num_utterances: int
+      The number of utterances to sample from per emotion and speaker
+    memory: ['ram','disk']
+      whether to read the files from RAM (pkl) or from disk
+    split: ['test', 'train', None]
+      what split of the dataset to return
+
+    Methods
+    ----------
+    __get_item__(idx) : returns dict
+      Returns a dictionary of lists for the idx speaker in the format
+      {emotion_name:[list of randomly sampled utterances]}
+      if split is equal to test, then returns the same data each time
+
+    Todo:
+    ----------
+    - Add validation/training split functionality
+
+    """
+
+    def __init__(self, split=None):
+
+        # self.split = split
+
+        assert split in (
+            'test', 'train', None), 'split parameter must equal "train", "test" or None'
+
+        with open('/content/drive/MyDrive/Colab Datasets/MEAD_3_total.pkl', 'rb') as f:
+            print('loading dataset from drive...')
+            self.dataset = pickle.load(f)
+
+        self.speakers = list(self.dataset.keys())
+        self.emotions = list(self.dataset[self.speakers[0]].keys())
+
+        df_utterances = pd.DataFrame(
+            data=np.zeros((len(self.emotions), len(self.speakers))),
+            columns=self.speakers,
+            index=self.emotions)
+        dataset_indices = []
+
+        for s in self.speakers:
+            for e in self.emotions:
+                df_utterances.at[e, s] = len(self.dataset[s][e])
+                for i in range(len(self.dataset[s][e])):
+                    dataset_indices.append((s, e, i))
+        self.indices = dataset_indices
+        self.df_utterances = df_utterances.astype(int)
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+
+        a_speaker, a_emotion, a_utterance = self.indices[idx]
+        anchor_audio = self.dataset[a_speaker][a_emotion][a_utterance]
+
+        p_emotion = a_emotion
+        p_speaker = random.choice([s for s in self.speakers if s != a_speaker])
+        p_utterance = random.choice(range(self.df_utterances.at[p_emotion, p_speaker]))
+        positive_audio = self.dataset[p_speaker][p_emotion][p_utterance]
+
+        n_emotion = random.choice([e for e in self.emotions if e != a_emotion])
+        n_speaker = a_speaker
+        if self.df_utterances.at[n_emotion, n_speaker] >= a_utterance:
+            n_utterance = a_utterance
+        else:
+            n_utterance = random.choice(range(self.df_utterances.at[n_emotion, n_speaker]))
+        negative_audio = self.dataset[n_speaker][n_emotion][n_utterance]
+
+        return ((anchor_audio, positive_audio, negative_audio),
+                (a_emotion, p_emotion, n_emotion),
+                (a_speaker, p_speaker, n_speaker),
+                (a_utterance, p_utterance, n_utterance))
+
+    def get_single(self, idx):
+        speaker, emotion, utterance = self.indices[idx]
+        audio = self.dataset[speaker][emotion][utterance]
+        return audio, emotion
+
+    def get_batch(self, indices):
+        audio_batch, emotion_batch = [], []
+        for idx in indices:
+            audio, emotion = self.get_single(idx)
+            audio_batch.append(audio)
+            emotion_batch.append(emotion)
+
+        return audio_batch, emotion_batch

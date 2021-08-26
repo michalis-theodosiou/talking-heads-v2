@@ -13,6 +13,11 @@ class VoiceEncoder_train(VoiceEncoder):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         super().__init__(device)
         self.relu = torch.nn.LeakyReLU()
+        self.softmax = torch.nn.Sequential(
+            torch.nn.Linear(256, 8),
+            torch.nn.LogSoftmax(0)
+        )
+        self.to(device)
 
     def embed_utterance_train(self, wav, rate=1.3, min_coverage=0.75):
         wav_slices, mel_slices = self.compute_partial_slices(len(wav), rate, min_coverage)
@@ -66,3 +71,17 @@ class VoiceEncoder_train(VoiceEncoder):
                         c += 1
 
         return output
+
+    def softmax_forward_single(self, data):
+        emb = self.embed_utterance_train(data)
+        softmax = self.softmax(emb)
+
+        return softmax
+
+    def softmax_forward_batch(self, batch):
+        output_list = []
+        for data in batch:
+            output = self.softmax_forward_single(data)
+            output_list.append(output)
+
+        return torch.stack(output_list)
