@@ -170,6 +170,19 @@ class audio_data_triplet(Dataset):
         self.indices = dataset_indices
         self.df_utterances = df_utterances.astype(int)
 
+        if split is not None:
+            indices = list(range(len(self.indices)))
+            test_split = 0.2
+            batch_size = 64
+            num_test = int(((len(indices)*test_split) // batch_size)*batch_size)
+            random.seed(0)
+            test_indices = random.sample(indices, num_test)
+            if split == 'test':
+                self.indices = [self.indices[idx] for idx in test_indices]
+            elif split == 'train':
+                train_indices = [i for i in indices if i not in test_indices]
+                self.indices = [self.indices[idx] for idx in train_indices]
+
     def __len__(self):
         return len(self.indices)
 
@@ -180,21 +193,17 @@ class audio_data_triplet(Dataset):
 
         p_emotion = a_emotion
         p_speaker = random.choice([s for s in self.speakers if s != a_speaker])
-        p_utterance = random.choice(range(self.df_utterances.at[p_emotion, p_speaker]))
+        p_utterance = random.choice([i for i in self.indices if i[0] ==
+                                    p_speaker and i[1] == p_emotion])[2]
         positive_audio = self.dataset[p_speaker][p_emotion][p_utterance]
 
         n_emotion = random.choice([e for e in self.emotions if e != a_emotion])
         n_speaker = a_speaker
-        if self.df_utterances.at[n_emotion, n_speaker] >= a_utterance:
-            n_utterance = a_utterance
-        else:
-            n_utterance = random.choice(range(self.df_utterances.at[n_emotion, n_speaker]))
+        n_utterance = random.choice([i for i in self.indices if i[0] ==
+                                    n_speaker and i[1] == n_emotion])[2]
         negative_audio = self.dataset[n_speaker][n_emotion][n_utterance]
 
-        return ((anchor_audio, positive_audio, negative_audio),
-                (a_emotion, p_emotion, n_emotion),
-                (a_speaker, p_speaker, n_speaker),
-                (a_utterance, p_utterance, n_utterance))
+        return (anchor_audio, positive_audio, negative_audio), a_emotion
 
     def get_single(self, idx):
         speaker, emotion, utterance = self.indices[idx]
@@ -205,6 +214,15 @@ class audio_data_triplet(Dataset):
         audio_batch, emotion_batch = [], []
         for idx in indices:
             audio, emotion = self.get_single(idx)
+            audio_batch.append(audio)
+            emotion_batch.append(emotion)
+
+        return audio_batch, emotion_batch
+
+    def get_triplet_batch(self, indices):
+        audio_batch, emotion_batch = [], []
+        for idx in indices:
+            audio, emotion = self[idx]
             audio_batch.append(audio)
             emotion_batch.append(emotion)
 
