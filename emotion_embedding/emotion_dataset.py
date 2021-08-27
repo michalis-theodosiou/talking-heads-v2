@@ -154,7 +154,7 @@ class audio_data_triplet(Dataset):
             dataset = pickle.load(f)
 
         speakers = list(dataset.keys())
-        self.emotions = list(dataset[self.speakers[0]].keys())
+        self.emotions = list(dataset[speakers[0]].keys())
 
         random.seed(1)
         test_speakers = random.sample(speakers, 10)
