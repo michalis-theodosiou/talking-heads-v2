@@ -151,10 +151,24 @@ class audio_data_triplet(Dataset):
 
         with open('/content/drive/MyDrive/Colab Datasets/MEAD_3_total.pkl', 'rb') as f:
             print('loading dataset from drive...')
-            self.dataset = pickle.load(f)
+            dataset = pickle.load(f)
 
-        self.speakers = list(self.dataset.keys())
-        self.emotions = list(self.dataset[self.speakers[0]].keys())
+        speakers = list(dataset.keys())
+        self.emotions = list(dataset[self.speakers[0]].keys())
+
+        random.seed(1)
+        test_speakers = random.sample(speakers, 10)
+        if split == 'train':
+            self.dataset = {spk: dataset[spk]
+                            for spk in speakers if spk not in test_speakers}
+            self.speakers = [speaker for speaker in speakers if speaker not in test_speakers]
+        elif split == 'test':
+            self.dataset = {spk: dataset[spk]
+                            for spk in speakers if spk in test_speakers}
+            self.speakers = test_speakers
+        elif split is None:
+            self.dataset = dataset
+            self.speakers = speakers
 
         df_utterances = pd.DataFrame(
             data=np.zeros((len(self.emotions), len(self.speakers))),
@@ -170,18 +184,18 @@ class audio_data_triplet(Dataset):
         self.indices = dataset_indices
         self.df_utterances = df_utterances.astype(int)
 
-        if split is not None:
-            indices = list(range(len(self.indices)))
-            test_split = 0.2
-            batch_size = 64
-            num_test = int(((len(indices)*test_split) // batch_size)*batch_size)
-            random.seed(0)
-            test_indices = random.sample(indices, num_test)
-            if split == 'test':
-                self.indices = [self.indices[idx] for idx in test_indices]
-            elif split == 'train':
-                train_indices = [i for i in indices if i not in test_indices]
-                self.indices = [self.indices[idx] for idx in train_indices]
+        # if split is not None:
+        #     indices = list(range(len(self.indices)))
+        #     test_split = 0.2
+        #     batch_size = 64
+        #     num_test = int(((len(indices)*test_split) // batch_size)*batch_size)
+        #     random.seed(0)
+        #     test_indices = random.sample(indices, num_test)
+        #     if split == 'test':
+        #         self.indices = [self.indices[idx] for idx in test_indices]
+        #     elif split == 'train':
+        #         train_indices = [i for i in indices if i not in test_indices]
+        #         self.indices = [self.indices[idx] for idx in train_indices]
 
     def __len__(self):
         return len(self.indices)

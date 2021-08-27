@@ -85,3 +85,55 @@ class VoiceEncoder_train(VoiceEncoder):
             output_list.append(output)
 
         return torch.stack(output_list)
+
+    def triplet_forward_single(self, data, softmax=False):
+        # data in the format (anchor, positive, negative)
+        # output (emb_anchor, emb_positive, emb_negative), ()
+        anchor, positive, negative = data
+        emb_anchor = self.embed_utterance_train(anchor)
+        emb_positive = self.embed_utterance_train(positive)
+        emb_negative = self.embed_utterance_train(negative)
+
+        if softmax is False:
+            return (emb_anchor, emb_positive, emb_negative)
+        elif softmax is True:
+            softmax_anchor = self.softmax(emb_anchor)
+            return (emb_anchor, emb_positive, emb_negative), softmax_anchor
+
+    def triplet_forward_batch(self, batch, softmax=False):
+        anchor_list = []
+        positive_list = []
+        negative_list = []
+        softmax_list = []
+
+        for triplet in batch:
+            if softmax is False:
+                emb_anchor, emb_positive, emb_negative = self.triplet_forward_single(
+                    triplet, softmax)
+                anchor_list.append(emb_anchor)
+                positive_list.append(emb_positive)
+                negative_list.append(emb_negative)
+            elif softmax is True:
+                (emb_anchor, emb_positive, emb_negative), softmax_anchor = self.triplet_forward_single(
+                    triplet, softmax)
+                anchor_list.append(emb_anchor)
+                positive_list.append(emb_positive)
+                negative_list.append(emb_negative)
+                softmax_list.append(softmax_anchor)
+
+        if softmax is False:
+            return torch.stack(anchor_list), torch.stack(positive_list), torch.stack(negative_list)
+        elif softmax is True:
+            return (torch.stack(anchor_list),
+                    torch.stack(positive_list),
+                    torch.stack(negative_list),
+                    torch.stack(softmax_list)
+                    )
+
+    def embedding_batch(self, batch):
+        output_list = []
+        for data in batch:
+            emb = self.embed_utterance_train(data)
+            output_list.append(emb)
+
+        return torch.stack(output_list)
