@@ -112,35 +112,6 @@ class audio_data_ge2e(Dataset):
 
 
 class audio_data_triplet(Dataset):
-    """
-    A class to load a batch of audio files to calculate the ge2e loss.
-    Creates returns data in the format
-
-    Input Params
-    -----------
-    directory : str
-      The directory where the audio files are located in the original MEAD directory structure
-    intensity: int
-      The intensity (from 1 - 3) from which to load audio
-    num_utterances: int
-      The number of utterances to sample from per emotion and speaker
-    memory: ['ram','disk']
-      whether to read the files from RAM (pkl) or from disk
-    split: ['test', 'train', None]
-      what split of the dataset to return
-
-    Methods
-    ----------
-    __get_item__(idx) : returns dict
-      Returns a dictionary of lists for the idx speaker in the format
-      {emotion_name:[list of randomly sampled utterances]}
-      if split is equal to test, then returns the same data each time
-
-    Todo:
-    ----------
-    - Add validation/training split functionality
-
-    """
 
     def __init__(self, split=None):
 
