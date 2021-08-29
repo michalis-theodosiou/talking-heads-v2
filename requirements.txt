@@ -1,2 +1,4 @@
 face_alignment
 resemblyzer
+pydub
+pynormalize
