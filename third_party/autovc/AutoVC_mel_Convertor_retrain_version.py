@@ -76,7 +76,7 @@ class AutoVC_mel_Convertor():
 
         return S, mean_emb, f0_onehot
 
-    def convert_wav_to_autovc_input(self, build_train_dataset=True, autovc_model_path=r'E:\Dataset\VCTK\stargan_vc\train_85_withpre1125000_local\360000-G.ckpt'):
+    def convert_wav_to_autovc_input(self, build_train_dataset=True):
 
         def pad_seq(x, base=32):
             len_out = int(base * ceil(float(x.shape[0]) / base))
@@ -87,7 +87,6 @@ class AutoVC_mel_Convertor():
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(device)
         G = Generator(16, 256, 512, 16).eval().to(device)
-        #g_checkpoint = torch.load(autovc_model_path, map_location=device)
         G.load_state_dict(self.g_checkpoint['model'])
 
         emb = np.loadtxt('autovc/retrain_version/obama_emb.txt')
@@ -202,7 +201,7 @@ class AutoVC_mel_Convertor():
 
         return aus
 
-    def convert_single_wav_to_autovc_input(self, audio_filename, autovc_model_path):
+    def convert_single_wav_to_autovc_input(self, audio_filename):
 
         def pad_seq(x, base=32):
             len_out = int(base * ceil(float(x.shape[0]) / base))
@@ -213,7 +212,6 @@ class AutoVC_mel_Convertor():
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         G = Generator(16, 256, 512, 16).eval().to(device)
 
-        #g_checkpoint = torch.load(autovc_model_path, map_location=device)
         G.load_state_dict(self.g_checkpoint['model'])
 
         emb = np.loadtxt('src/autovc/retrain_version/obama_emb.txt')
