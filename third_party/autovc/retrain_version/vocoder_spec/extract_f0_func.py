@@ -6,10 +6,11 @@ from scipy import signal
 from librosa.filters import mel
 from numpy.random import RandomState
 from pysptk import sptk
-from src.autovc.retrain_version.vocoder_spec.utils import butter_highpass
-from src.autovc.retrain_version.vocoder_spec.utils import speaker_normalization
+from third_party.autovc.retrain_version.vocoder_spec.utils import butter_highpass
+from third_party.autovc.retrain_version.vocoder_spec.utils import speaker_normalization
 from scipy.signal import get_window
 import glob
+
 
 def pySTFT(x, fft_length=1024, hop_length=256):
     x = np.pad(x, int(fft_length // 2), mode='reflect')
@@ -125,7 +126,6 @@ def extract_f0_func_audiofile(audio_file, gender='M'):
     f0_norm = speaker_normalization(f0_rapt, index_nonzero, mean_f0, std_f0)
 
     return S, f0_norm
-
 
 
 if __name__ == '__main__':
