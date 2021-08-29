@@ -71,7 +71,7 @@ class AutoVC_mel_Convertor():
         from third_party.autovc.utils import quantize_f0_interp
         f0_onehot = quantize_f0_interp(f0_norm)
 
-        from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
+        from third_party.resemblyer_util.speaker_emb import get_spk_emb
         mean_emb, _ = get_spk_emb(audio_file)
 
         return S, mean_emb, f0_onehot
@@ -228,7 +228,7 @@ class AutoVC_mel_Convertor():
         x_real_src, f0_norm = extract_f0_func_audiofile(audio_file, 'F')
         from third_party.autovc.utils import quantize_f0_interp
         f0_org_src = quantize_f0_interp(f0_norm)
-        from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
+        from third_party.resemblyer_util.speaker_emb import get_spk_emb
         emb, _ = get_spk_emb(audio_file)
 
         ''' normal length version '''
