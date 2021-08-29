@@ -65,10 +65,10 @@ class AutoVC_mel_Convertor():
         normalized_sound = match_target_amplitude(sound, -20.0)
         normalized_sound.export(audio_file, format='wav')
 
-        from src.autovc.retrain_version.vocoder_spec.extract_f0_func import extract_f0_func_audiofile
+        from third_party.autovc.retrain_version.vocoder_spec.extract_f0_func import extract_f0_func_audiofile
         S, f0_norm = extract_f0_func_audiofile(audio_file, 'M')
 
-        from src.autovc.utils import quantize_f0_interp
+        from third_party.autovc.utils import quantize_f0_interp
         f0_onehot = quantize_f0_interp(f0_norm)
 
         from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
@@ -224,9 +224,9 @@ class AutoVC_mel_Convertor():
         normalized_sound = match_target_amplitude(sound, -20.0)
         normalized_sound.export(audio_file, format='wav')
 
-        from src.autovc.retrain_version.vocoder_spec.extract_f0_func import extract_f0_func_audiofile
+        from third_party.autovc.retrain_version.vocoder_spec.extract_f0_func import extract_f0_func_audiofile
         x_real_src, f0_norm = extract_f0_func_audiofile(audio_file, 'F')
-        from src.autovc.utils import quantize_f0_interp
+        from third_party.autovc.utils import quantize_f0_interp
         f0_org_src = quantize_f0_interp(f0_norm)
         from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
         emb, _ = get_spk_emb(audio_file)
