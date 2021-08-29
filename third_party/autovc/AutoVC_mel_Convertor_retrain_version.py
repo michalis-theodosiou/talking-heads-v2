@@ -36,6 +36,11 @@ class AutoVC_mel_Convertor():
         print('{} out of {} are in this portion'.format(
             len(self.selected_filenames), len(self.filenames)))
 
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        os.system(
+            'gdown -O third_party/autovc/ckpt_autovc.pth https://drive.google.com/uc?id=1ZiwPp_h62LtjU0DwpelLUoodKPR85K7x -q')
+        self.g_checkpoint = torch.load('third_party/autovc/ckpt_autovc.pth', map_location=device)
+
     def __convert_single_only_au_AutoVC_format_to_dataset__(self, filename, build_train_dataset=True):
         """
         Convert a single file (only audio in AutoVC embedding format) to numpy arrays
@@ -82,8 +87,8 @@ class AutoVC_mel_Convertor():
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(device)
         G = Generator(16, 256, 512, 16).eval().to(device)
-        g_checkpoint = torch.load(autovc_model_path, map_location=device)
-        G.load_state_dict(g_checkpoint['model'])
+        #g_checkpoint = torch.load(autovc_model_path, map_location=device)
+        G.load_state_dict(self.g_checkpoint['model'])
 
         emb = np.loadtxt('autovc/retrain_version/obama_emb.txt')
         emb_trg = torch.from_numpy(emb[np.newaxis, :].astype('float32')).to(device)
@@ -208,8 +213,8 @@ class AutoVC_mel_Convertor():
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         G = Generator(16, 256, 512, 16).eval().to(device)
 
-        g_checkpoint = torch.load(autovc_model_path, map_location=device)
-        G.load_state_dict(g_checkpoint['model'])
+        #g_checkpoint = torch.load(autovc_model_path, map_location=device)
+        G.load_state_dict(self.g_checkpoint['model'])
 
         emb = np.loadtxt('src/autovc/retrain_version/obama_emb.txt')
         emb_trg = torch.from_numpy(emb[np.newaxis, :].astype('float32')).to(device)
