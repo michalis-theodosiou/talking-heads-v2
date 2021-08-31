@@ -1,20 +1,19 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
 import numpy as np
 import os
-import matplotlib.pyplot as plt
 import cv2
-import ffmpeg
 
 OTHER_SPECIFIC_VOICE = None
+
 
 class Vis():
 
@@ -40,7 +39,7 @@ class Vis():
                                  cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (400, 400))
 
         frames = np.min((fls.shape[0], frames))
-        for i in range(frames): #fls.shape[0]):
+        for i in range(frames):  # fls.shape[0]):
             # print(i, fls.shape[0])
             frame = np.ones((400, 400, 3), np.uint8) * 0
             frame = self.__vis_landmark_on_img__(frame, fls[i])
@@ -62,16 +61,14 @@ class Vis():
 
         os.remove(os.path.join('examples', 'tmp.mp4'))
 
-
-
-
     def __vis_landmark_on_img__(self, img, shape, linewidth=2):
         '''
         Visualize landmark on images.
         '''
         def draw_curve(idx_list, color=(0, 255, 0), loop=False, lineWidth=linewidth):
             for i in idx_list:
-                cv2.line(img, (shape[i, 0], shape[i, 1]), (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
+                cv2.line(img, (shape[i, 0], shape[i, 1]),
+                         (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
             if (loop):
                 cv2.line(img, (shape[idx_list[0], 0], shape[idx_list[0], 1]),
                          (shape[idx_list[-1] + 1, 0], shape[idx_list[-1] + 1, 1]), color, lineWidth)
@@ -99,7 +96,6 @@ class Vis():
         return img
 
 
-
 class Vis_old():
 
     def __init__(self, run_name, pred_fl_filename, audio_filename, av_name='NAME', fps=100, frames=625,
@@ -123,7 +119,7 @@ class Vis_old():
                                  cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (400, 400))
 
         frames = np.min((fls.shape[0], frames))
-        for i in range(frames): #fls.shape[0]):
+        for i in range(frames):  # fls.shape[0]):
             # print(i, fls.shape[0])
             frame = np.ones((400, 400, 3), np.uint8) * 0
             frame = self.__vis_landmark_on_img__(frame, fls[i])
@@ -158,17 +154,14 @@ class Vis_old():
         # os.remove(os.path.join(self.src_dir, filename))
         # exit(0)
 
-
-
-
-
     def __vis_landmark_on_img__(self, img, shape, linewidth=2):
         '''
         Visualize landmark on images.
         '''
         def draw_curve(idx_list, color=(0, 255, 0), loop=False, lineWidth=linewidth):
             for i in idx_list:
-                cv2.line(img, (shape[i, 0], shape[i, 1]), (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
+                cv2.line(img, (shape[i, 0], shape[i, 1]),
+                         (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
             if (loop):
                 cv2.line(img, (shape[idx_list[0], 0], shape[idx_list[0], 1]),
                          (shape[idx_list[-1] + 1, 0], shape[idx_list[-1] + 1, 1]), color, lineWidth)
@@ -222,7 +215,7 @@ class Vis_comp():
                                  cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (400, 400))
 
         frames = np.min((fls.shape[0], frames))
-        for i in range(frames): #fls.shape[0]):
+        for i in range(frames):  # fls.shape[0]):
             # print(i, fls.shape[0])
             frame = np.ones((400, 400, 3), np.uint8) * 0
             frame = self.__vis_landmark_on_img__(frame, fls[i])
@@ -243,14 +236,14 @@ class Vis_comp():
 
         os.remove(os.path.join(self.src_dir, 'tmp.mp4'))
 
-
     def __vis_landmark_on_img__(self, img, shape, linewidth=2):
         '''
         Visualize landmark on images.
         '''
         def draw_curve(idx_list, color=(0, 255, 0), loop=False, lineWidth=linewidth):
             for i in idx_list:
-                cv2.line(img, (shape[i, 0], shape[i, 1]), (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
+                cv2.line(img, (shape[i, 0], shape[i, 1]),
+                         (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
             if (loop):
                 cv2.line(img, (shape[idx_list[0], 0], shape[idx_list[0], 1]),
                          (shape[idx_list[-1] + 1, 0], shape[idx_list[-1] + 1, 1]), color, lineWidth)
