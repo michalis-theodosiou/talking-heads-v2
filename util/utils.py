@@ -1,13 +1,14 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
+import numpy
 import torch.nn as nn
 import torch.nn.init as init
 import os
@@ -15,10 +16,12 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 class ShapeParts:
     def __init__(self, np_pts):
@@ -62,6 +65,7 @@ class Record():
                     self.max_min_data = self.data[t]
                     return True
         return False
+
 
 def weight_init(m):
     '''
@@ -130,10 +134,11 @@ def weight_init(m):
             else:
                 init.normal_(param.data)
 
+
 def get_n_params(model):
-    pp=0
+    pp = 0
     for p in list(model.parameters()):
-        nn=1
+        nn = 1
         for s in list(p.size()):
             nn = nn*s
         pp += nn
@@ -165,7 +170,8 @@ def vis_landmark_on_img(img, shape, linewidth=2):
     else:
         def draw_curve(idx_list, color=(0, 255, 0), loop=False, lineWidth=linewidth):
             for i in idx_list:
-                cv2.line(img, (shape[i, 0], shape[i, 1]), (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
+                cv2.line(img, (shape[i, 0], shape[i, 1]),
+                         (shape[i + 1, 0], shape[i + 1, 1]), color, lineWidth)
             if (loop):
                 cv2.line(img, (shape[idx_list[0], 0], shape[idx_list[0], 1]),
                          (shape[idx_list[-1] + 1, 0], shape[idx_list[-1] + 1, 1]), color, lineWidth)
@@ -185,7 +191,8 @@ def vis_landmark_on_img(img, shape, linewidth=2):
 def vis_landmark_on_plt(fl,  x_offset=0.0, show_now=True, c='r'):
     def draw_curve(shape, idx_list, loop=False, x_offset=0.0, c=None):
         for i in idx_list:
-            plt.plot((shape[i, 0] + x_offset, shape[i + 1, 0] + x_offset), (-shape[i, 1], -shape[i + 1, 1]), c=c, lineWidth=1)
+            plt.plot((shape[i, 0] + x_offset, shape[i + 1, 0] + x_offset),
+                     (-shape[i, 1], -shape[i + 1, 1]), c=c, lineWidth=1)
         if (loop):
             plt.plot((shape[idx_list[0], 0] + x_offset, shape[idx_list[-1] + 1, 0] + x_offset),
                      (-shape[idx_list[0], 1], -shape[idx_list[-1] + 1, 1]), c=c, lineWidth=1)
@@ -209,7 +216,7 @@ def try_mkdir(dir):
     except:
         pass
 
-import numpy
+
 def smooth(x, window_len=11, window='hanning'):
     """smooth the data using a window with requested size.
 
@@ -270,32 +277,41 @@ def get_puppet_info(DEMO_CH, ROOT_DIR):
     B = 5000
     # for wilk example
     if (DEMO_CH == 'wilk_old'):
-        bound = np.array([-B, -B, -B, 459, -B, B+918, 419, B+918, B+838, B+918, B+838, 459, B+838, -B, 419, -B]).reshape(1, -1)
+        bound = np.array([-B, -B, -B, 459, -B, B+918, 419, B+918, B+838, B +
+                         918, B+838, 459, B+838, -B, 419, -B]).reshape(1, -1)
         # bound = np.array([0, 0, 0, 459, 0, 918, 419, 918, 838, 918, 838, 459, 838, 0, 419, 0]).reshape(1, -1)
         scale, shift = -0.005276414887140783, np.array([-475.4316, -193.53225])
     elif (DEMO_CH == 'sketch'):
-        bound = np.array([-10000, -10000, -10000, 221, -10000, 10443, 232, 10443, 10465, 10443, 10465, 221, 10465, -10000, 232, -10000]).reshape(1, -1)
+        bound = np.array([-10000, -10000, -10000, 221, -10000, 10443, 232, 10443,
+                         10465, 10443, 10465, 221, 10465, -10000, 232, -10000]).reshape(1, -1)
         scale, shift = -0.006393177201290783, np.array([-226.8411, -176.5216])
     elif (DEMO_CH == 'onepunch'):
-        bound = np.array([0, 0, 0, 168, 0, 337, 282, 337, 565, 337, 565, 168, 565, 0, 282, 0]).reshape(1, -1)
+        bound = np.array([0, 0, 0, 168, 0, 337, 282, 337, 565, 337,
+                         565, 168, 565, 0, 282, 0]).reshape(1, -1)
         scale, shift = -0.007558707536598317, np.array([-301.4903, -120.05265])
     elif (DEMO_CH == 'cat'):
-        bound = np.array([0, 0, 0, 315, 0, 631, 299, 631, 599, 631, 599, 315, 599, 0, 299, 0]).reshape(1, -1)
+        bound = np.array([0, 0, 0, 315, 0, 631, 299, 631, 599, 631,
+                         599, 315, 599, 0, 299, 0]).reshape(1, -1)
         scale, shift = -0.009099476040795225, np.array([-297.17085, -259.2363])
     elif (DEMO_CH == 'paint'):
-        bound = np.array([0, 0, 0, 249, 0, 499, 212, 499, 424, 499, 424, 249, 424, 0, 212, 0]).reshape(1, -1)
+        bound = np.array([0, 0, 0, 249, 0, 499, 212, 499, 424, 499,
+                         424, 249, 424, 0, 212, 0]).reshape(1, -1)
         scale, shift = -0.007409177996872789, np.array([-161.92345878, -249.40250103])
     elif (DEMO_CH == 'mulaney'):
-        bound = np.array([0, 0, 0, 255, 0, 511, 341, 511, 682, 511, 682, 255, 682, 0, 341, 0]).reshape(1, -1)
+        bound = np.array([0, 0, 0, 255, 0, 511, 341, 511, 682, 511,
+                         682, 255, 682, 0, 341, 0]).reshape(1, -1)
         scale, shift = -0.010651548568731444, np.array([-333.54245, -189.081])
     elif (DEMO_CH == 'cartoonM_old'):
-        bound = np.array([0, 0, 0, 299, 0, 599, 399, 599, 799, 599, 799, 299, 799, 0, 399, 0]).reshape(1, -1)
+        bound = np.array([0, 0, 0, 299, 0, 599, 399, 599, 799, 599,
+                         799, 299, 799, 0, 399, 0]).reshape(1, -1)
         scale, shift = -0.0055312373170456845, np.array([-398.6125, -240.45235])
     elif (DEMO_CH == 'beer'):
-        bound = np.array([0, 0, 0, 309, 0, 618, 260, 618, 520, 618, 520, 309, 520, 0, 260, 0]).reshape(1, -1)
+        bound = np.array([0, 0, 0, 309, 0, 618, 260, 618, 520, 618,
+                         520, 309, 520, 0, 260, 0]).reshape(1, -1)
         scale, shift = -0.0054102709937112374, np.array([-254.1478, -156.6971])
     elif (DEMO_CH == 'color'):
-        bound = np.array([0, 0, 0, 140, 0, 280, 249, 280, 499, 280, 499, 140, 499, 0, 249, 0]).reshape(1, -1)
+        bound = np.array([0, 0, 0, 140, 0, 280, 249, 280, 499, 280,
+                         499, 140, 499, 0, 249, 0]).reshape(1, -1)
         scale, shift = -0.012986159189209149, np.array([-237.27065, -79.2465])
     else:
         if (os.path.exists(os.path.join(ROOT_DIR, DEMO_CH + '.jpg'))):
@@ -345,23 +361,29 @@ def close_input_face_mouth(shape_3d, p1=0.7, p2=0.5):
 
     return shape_3d
 
+
 def norm_input_face(shape_3d):
     scale = 1.6 / (shape_3d[0, 0] - shape_3d[16, 0])
     shift = - 0.5 * (shape_3d[0, 0:2] + shape_3d[16, 0:2])
     shape_3d[:, 0:2] = (shape_3d[:, 0:2] + shift) * scale
-    face_std = np.loadtxt('src/dataset/utils/STD_FACE_LANDMARKS.txt').reshape(68, 3)
+    face_std = np.loadtxt('STD_FACE_LANDMARKS.txt').reshape(68, 3)
     shape_3d[:, -1] = face_std[:, -1] * 0.1
     shape_3d[:, 0:2] = -shape_3d[:, 0:2]
 
     return shape_3d, scale, shift
 
+
 def add_naive_eye(fl):
     for t in range(fl.shape[0]):
         r = 0.95
-        fl[t, 37], fl[t, 41] = r * fl[t, 37] + (1 - r) * fl[t, 41], (1 - r) * fl[t, 37] + r * fl[t, 41]
-        fl[t, 38], fl[t, 40] = r * fl[t, 38] + (1 - r) * fl[t, 40], (1 - r) * fl[t, 38] + r * fl[t, 40]
-        fl[t, 43], fl[t, 47] = r * fl[t, 43] + (1 - r) * fl[t, 47], (1 - r) * fl[t, 43] + r * fl[t, 47]
-        fl[t, 44], fl[t, 46] = r * fl[t, 44] + (1 - r) * fl[t, 46], (1 - r) * fl[t, 44] + r * fl[t, 46]
+        fl[t, 37], fl[t, 41] = r * fl[t, 37] + \
+            (1 - r) * fl[t, 41], (1 - r) * fl[t, 37] + r * fl[t, 41]
+        fl[t, 38], fl[t, 40] = r * fl[t, 38] + \
+            (1 - r) * fl[t, 40], (1 - r) * fl[t, 38] + r * fl[t, 40]
+        fl[t, 43], fl[t, 47] = r * fl[t, 43] + \
+            (1 - r) * fl[t, 47], (1 - r) * fl[t, 43] + r * fl[t, 47]
+        fl[t, 44], fl[t, 46] = r * fl[t, 44] + \
+            (1 - r) * fl[t, 46], (1 - r) * fl[t, 44] + r * fl[t, 46]
 
     K1, K2 = 10, 15
     length = fl.shape[0]
@@ -373,10 +395,14 @@ def add_naive_eye(fl):
         if (t < length - 1 - K2):
             close_time_stamp.append(t)
     for t in close_time_stamp:
-        fl[t, 37], fl[t, 41] = 0.25 * fl[t, 37] + 0.75 * fl[t, 41], 0.25 * fl[t, 37] + 0.75 * fl[t, 41]
-        fl[t, 38], fl[t, 40] = 0.25 * fl[t, 38] + 0.75 * fl[t, 40], 0.25 * fl[t, 38] + 0.75 * fl[t, 40]
-        fl[t, 43], fl[t, 47] = 0.25 * fl[t, 43] + 0.75 * fl[t, 47], 0.25 * fl[t, 43] + 0.75 * fl[t, 47]
-        fl[t, 44], fl[t, 46] = 0.25 * fl[t, 44] + 0.75 * fl[t, 46], 0.25 * fl[t, 44] + 0.75 * fl[t, 46]
+        fl[t, 37], fl[t, 41] = 0.25 * fl[t, 37] + 0.75 * \
+            fl[t, 41], 0.25 * fl[t, 37] + 0.75 * fl[t, 41]
+        fl[t, 38], fl[t, 40] = 0.25 * fl[t, 38] + 0.75 * \
+            fl[t, 40], 0.25 * fl[t, 38] + 0.75 * fl[t, 40]
+        fl[t, 43], fl[t, 47] = 0.25 * fl[t, 43] + 0.75 * \
+            fl[t, 47], 0.25 * fl[t, 43] + 0.75 * fl[t, 47]
+        fl[t, 44], fl[t, 46] = 0.25 * fl[t, 44] + 0.75 * \
+            fl[t, 46], 0.25 * fl[t, 44] + 0.75 * fl[t, 46]
 
         def interp_fl(t0, t1, t2, r):
             for index in [37, 38, 40, 41, 43, 44, 46, 47]:
