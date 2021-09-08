@@ -9,14 +9,15 @@ class VoiceEncoder_train(VoiceEncoder):
     ge2e forward pass
     """
 
-    def __init__(self):
+    def __init__(self, softmax=True):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         super().__init__(device)
         self.relu = torch.nn.LeakyReLU()
-        self.softmax = torch.nn.Sequential(
-            torch.nn.Linear(256, 8),
-            torch.nn.LogSoftmax(0)
-        )
+        if softmax:
+            self.softmax = torch.nn.Sequential(
+                torch.nn.Linear(256, 8),
+                torch.nn.LogSoftmax(0)
+            )
         self.to(device)
 
     def embed_utterance_train(self, wav, rate=1.3, min_coverage=0.75):
