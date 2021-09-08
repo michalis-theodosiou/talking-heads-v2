@@ -137,3 +137,22 @@ class VoiceEncoder_train(VoiceEncoder):
             output_list.append(emb)
 
         return torch.stack(output_list)
+
+    def forward_emb_softmax(self, data):
+        emb = self.embed_utterance_train(data)
+        softmax = self.softmax(emb)
+
+        return emb, softmax
+
+    def process_ravdess(self, files):
+        from resemblyzer import preprocess_wav
+        embeddings = []
+        softmax = []
+        with torch.no_grad():
+            for f in files:
+                proc = preprocess_wav(f)
+                emb, smax = self.forward_emb_softmax(proc)
+                embeddings.append(emb)
+                softmax.append(smax)
+
+        return torch.stack(embeddings), torch.stack(softmax)
