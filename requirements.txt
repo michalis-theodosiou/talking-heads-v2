@@ -4,3 +4,4 @@ pydub
 pynormalize
 pysptk
 pyworld
+ffmpeg
