@@ -129,6 +129,7 @@ class audio_data_triplet(Dataset):
 
         random.seed(1)
         test_speakers = random.sample(speakers, 10)
+
         if split == 'train':
             self.dataset = {spk: dataset[spk]
                             for spk in speakers if spk not in test_speakers}
