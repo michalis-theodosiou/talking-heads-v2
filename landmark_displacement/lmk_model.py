@@ -8,7 +8,7 @@ import numpy as np
 import pickle
 
 
-class Audio2landmark_model_test_2():
+class Audio2landmark_model_talkingheads():
 
     def __init__(self, jpg_shape, ckpt, output_folder):
         '''
