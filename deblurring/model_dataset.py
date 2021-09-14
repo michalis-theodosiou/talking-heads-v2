@@ -9,14 +9,15 @@ import random
 
 
 class DeblurringModule(nn.Module):
-    def __init__(self):
-
+    def __init__(self, kernel_size=3):
+        assert kernel_size % 2 == 1, 'kernel size must be odd'
         super(DeblurringModule, self).__init__()
 
-        relu = nn.ReLU(inplace=True)
-        conv_in = nn.Conv2d(3, 64, 3, 1, 1, bias=False)
-        conv_out = nn.Conv2d(64, 3, 3, 1, 1, bias=False)
-        conv_mid = nn.Conv2d(64, 64, 3, 1, 1, bias=False)
+        padding = kernel_size//2
+        relu = nn.LeakyReLU(inplace=True)
+        conv_in = nn.Conv2d(3, 64, kernel_size, stride=1, padding=padding, bias=False)
+        conv_out = nn.Conv2d(64, 3, kernel_size, stride=1, padding=padding, bias=False)
+        conv_mid = nn.Conv2d(64, 64, kernel_size, stride=1, padding=padding, bias=False)
 
         layers = []
         layers.append(conv_in)
@@ -32,16 +33,6 @@ class DeblurringModule(nn.Module):
         out = self.model(img)
         final_out = torch.add(out, img)
         return final_out
-
-
-def init_model(model, state_file=None):
-    if state_file is None:
-        for param in model.parameters():
-            if param.dim() > 1:
-                torch.nn.init.xavier_uniform_(param)
-    else:
-        ckpt = torch.load(state_file)
-        model.load_state_dict(ckpt)
 
 
 class DeblurringDataset(Dataset):
