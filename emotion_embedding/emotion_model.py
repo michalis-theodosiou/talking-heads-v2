@@ -163,4 +163,4 @@ class VoiceEncoder_train(VoiceEncoder):
         self.eval()
         with torch.no_grad():
             audio = preprocess_wav(wav)
-            return embed_utterance_train(audio)
+            return self.embed_utterance_train(audio)

@@ -213,3 +213,19 @@ class audio_data_triplet(Dataset):
             emotion_batch.append(emotion)
 
         return audio_batch, emotion_batch
+
+
+def return_pca_centroid(embedding, centroids, pca_centroids):
+    max_sim = -2
+    for emotion in centroids.keys():
+        sim = cosine_similarity(embedding, centroids[emotion])
+        if sim > max_sim:
+            max_emotion = emotion
+            max_sim = sim
+    print(f'inferred "{max_emotion}"')
+    return pca_centroids[max_emotion]
+
+
+def cosine_similarity(a, b):
+    cos_sim = np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
+    return cos_sim
