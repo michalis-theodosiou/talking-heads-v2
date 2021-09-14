@@ -223,7 +223,7 @@ def return_pca_centroid(embedding, centroids, pca_centroids):
             max_emotion = emotion
             max_sim = sim
     print(f'inferred "{max_emotion}"')
-    return pca_centroids[max_emotion]
+    return pca_centroids[max_emotion], max_emotion
 
 
 def cosine_similarity(a, b):
