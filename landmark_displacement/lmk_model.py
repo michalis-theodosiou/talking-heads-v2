@@ -70,8 +70,8 @@ class Audio2landmark_model_talkingheads():
             m = np.mean(np_fl_dis_pred[min_k_idx[:K], calib_i])
             np_fl_dis_pred[:, calib_i] = np_fl_dis_pred[:, calib_i] - m
         baseline_pred_fls = torch.tensor(np_fl_dis_pred, requires_grad=False).to(device)
-        # baseline_pred_fls[:, 48 * 3::3] *= self.opt_parser.amp_lip_x  # mouth x
-        # baseline_pred_fls[:, 48 * 3 + 1::3] *= self.opt_parser.amp_lip_y  # mouth y
+        baseline_pred_fls[:, 48 * 3::3] *= 2  # mouth x
+        baseline_pred_fls[:, 48 * 3 + 1::3] *= 2  # mouth y
         return baseline_pred_fls
 
     def __train_pass__(self, au_emb=None, vis_fls=False):
