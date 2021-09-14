@@ -179,3 +179,17 @@ class Audio2landmark_model_talkingheads():
                     + fl_dis_pred_pos_numpy[p, 49 * 3+1:54 * 3+1:3] \
                     - fl_dis_pred_pos_numpy[p, 60 * 3+1:65 * 3+1:3]
         return fl_dis_pred_pos_numpy
+
+
+def lmk_emotion_adjustment(lmks, EMOTION):
+    if EMOTION in ('surprised', 'happy', 'fear'):
+        lmks[[37, 38, 43, 44], 1] -= 1  # larger eyes
+        lmks[[40, 41, 46, 47], 1] += 1  # larger eyes
+    if EMOTION == 'surprised':
+        lmks[[17, 18, 19, 20, 21, 22, 23, 24, 25, 26]] -= 4  # raise eyebrows
+    if EMOTION == 'fear':
+        lmks[[17, 18, 19, 20, 21, 22, 23, 24, 25, 26]] -= 2  # raise eyebrows
+    if EMOTION == 'happy':
+        lmks[48:, 0] = (lmks[48:, 0] - np.mean(lmks[48:, 0])) * \
+            1.1 + np.mean(lmks[48:, 0])  # wider lips
+    return lmks
