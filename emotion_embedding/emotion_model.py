@@ -1,6 +1,7 @@
 from resemblyzer import VoiceEncoder, audio
 import torch
 import numpy as np
+from resemblyzer import preprocess_wav
 
 
 class VoiceEncoder_train(VoiceEncoder):
@@ -157,3 +158,9 @@ class VoiceEncoder_train(VoiceEncoder):
                 softmax.append(smax)
 
         return torch.stack(embeddings), torch.stack(softmax)
+
+    def eval_wav(self, wav):
+        self.eval()
+        with torch.no_grad():
+            audio = preprocess_wav(wav)
+            return embed_utterance_train(audio)
